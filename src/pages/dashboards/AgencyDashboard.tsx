@@ -12,7 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Award, IndianRupee, Clock, Calendar, CheckCircle } from 'lucide-react';
+import { Award, IndianRupee, Clock, Calendar, CircleCheck as CheckCircle } from 'lucide-react';
 import { projects, agencies } from '@/data/dummyData';
 
 export default function AgencyDashboard() {

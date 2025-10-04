@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Award, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { Award, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Clock } from 'lucide-react';
 import { agencies, agencyHistory } from '@/data/dummyData';
 import { Progress } from '@/components/ui/progress';
 

@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { MapPin, Building2, FolderKanban, IndianRupee, Calendar, CheckCircle } from 'lucide-react';
+import { MapPin, Building2, FolderKanban, IndianRupee, Calendar, CircleCheck as CheckCircle } from 'lucide-react';
 import { districtData, agencies, projects } from '@/data/dummyData';
 
 export default function DistrictOfficerDashboard() {

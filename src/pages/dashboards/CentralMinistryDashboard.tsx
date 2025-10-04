@@ -17,7 +17,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { Map, IndianRupee, TrendingUp, Building2, Award, AlertTriangle } from 'lucide-react';
+import { Map, IndianRupee, TrendingUp, Building2, Award, TriangleAlert as AlertTriangle } from 'lucide-react';
 import { stateData, componentPerformance, agencies } from '@/data/dummyData';
 
 export default function CentralMinistryDashboard() {

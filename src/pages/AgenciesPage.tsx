@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Search, Filter, Building2, Mail, Phone, Eye, Award, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Search, Filter, Building2, Mail, Phone, Eye, Award, TrendingUp, TriangleAlert as AlertTriangle } from 'lucide-react';
 import { agencies, agencyHistory } from '@/data/dummyData';
 
 export default function AgenciesPage() {
