@@ -26,19 +26,33 @@ export default function ProjectsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [componentFilter, setComponentFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('all');
+  const [districtFilter, setDistrictFilter] = useState('all');
+  const [fundSizeFilter, setFundSizeFilter] = useState('all');
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.district.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.state.toLowerCase().includes(searchTerm.toLowerCase());
+      project.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.agency.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesComponent = componentFilter === 'all' || project.component === componentFilter;
     const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+    const matchesState = stateFilter === 'all' || project.state === stateFilter;
+    const matchesDistrict = districtFilter === 'all' || project.district === districtFilter;
 
-    return matchesSearch && matchesComponent && matchesStatus;
+    let matchesFundSize = true;
+    if (fundSizeFilter === 'small') matchesFundSize = project.budget < 3000000;
+    else if (fundSizeFilter === 'medium') matchesFundSize = project.budget >= 3000000 && project.budget < 7000000;
+    else if (fundSizeFilter === 'large') matchesFundSize = project.budget >= 7000000;
+
+    return matchesSearch && matchesComponent && matchesStatus && matchesState && matchesDistrict && matchesFundSize;
   });
+
+  const uniqueStates = [...new Set(projects.map(p => p.state))];
+  const uniqueDistricts = [...new Set(projects.map(p => p.district))];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -141,38 +155,75 @@ export default function ProjectsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  placeholder="Search by project name, district, or state..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+            <div className="space-y-4 mb-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    placeholder="Search by project name, district, state, or agency..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={componentFilter} onValueChange={setComponentFilter}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="Component" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Components</SelectItem>
+                    <SelectItem value="Adarsh Gram">Adarsh Gram</SelectItem>
+                    <SelectItem value="GIA">GIA</SelectItem>
+                    <SelectItem value="Hostel">Hostel</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-40">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                    <SelectItem value="Ongoing">Ongoing</SelectItem>
+                    <SelectItem value="Delayed">Delayed</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={componentFilter} onValueChange={setComponentFilter}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Component" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Components</SelectItem>
-                  <SelectItem value="Adarsh Gram">Adarsh Gram</SelectItem>
-                  <SelectItem value="GIA">GIA</SelectItem>
-                  <SelectItem value="Hostel">Hostel</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="Ongoing">Ongoing</SelectItem>
-                  <SelectItem value="Delayed">Delayed</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col md:flex-row gap-4">
+                <Select value={stateFilter} onValueChange={setStateFilter}>
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue placeholder="Filter by State" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All States</SelectItem>
+                    {uniqueStates.map(state => (
+                      <SelectItem key={state} value={state}>{state}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={districtFilter} onValueChange={setDistrictFilter}>
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue placeholder="Filter by District" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Districts</SelectItem>
+                    {uniqueDistricts.map(district => (
+                      <SelectItem key={district} value={district}>{district}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={fundSizeFilter} onValueChange={setFundSizeFilter}>
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue placeholder="Fund Size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sizes</SelectItem>
+                    <SelectItem value="small">Small (&lt;₹30L)</SelectItem>
+                    <SelectItem value="medium">Medium (₹30L-₹70L)</SelectItem>
+                    <SelectItem value="large">Large (&gt;₹70L)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid gap-4">
@@ -212,18 +263,22 @@ export default function ProjectsPage() {
                             </Button>
                           </div>
 
-                          <div className="grid md:grid-cols-3 gap-4 text-sm">
+                          <div className="grid md:grid-cols-4 gap-3 text-sm">
                             <div className="flex items-center gap-2 text-slate-600">
                               <MapPin className="w-4 h-4" />
                               <span>{project.district}, {project.state}</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600">
                               <Calendar className="w-4 h-4" />
-                              <span>{project.startDate} to {project.endDate}</span>
+                              <span>{project.startDate}</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600">
                               <IndianRupee className="w-4 h-4" />
-                              <span>Budget: ₹{(project.budget / 100000).toFixed(1)}L</span>
+                              <span>₹{(project.budget / 100000).toFixed(1)}L</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-600">
+                              <FolderKanban className="w-4 h-4" />
+                              <span>{project.phase}</span>
                             </div>
                           </div>
 
@@ -233,9 +288,13 @@ export default function ProjectsPage() {
                               <span className="font-semibold text-slate-800">{project.progress}%</span>
                             </div>
                             <Progress value={project.progress} className="h-2" />
-                            <div className="flex items-center justify-between text-xs text-slate-500">
+                            <div className="grid md:grid-cols-3 gap-2 text-xs text-slate-500 mt-2">
                               <span>Utilized: ₹{(project.utilized / 100000).toFixed(1)}L</span>
-                              <span>Agency: {project.agency}</span>
+                              <span>Pending: ₹{(project.fundPending / 100000).toFixed(1)}L</span>
+                              <span className="md:col-span-1">Milestones: {project.milestonesCompleted}/{project.milestones}</span>
+                            </div>
+                            <div className="text-xs text-slate-500 mt-1">
+                              <span className="font-medium">Agency:</span> {project.agency}
                             </div>
                           </div>
                         </div>
@@ -275,7 +334,7 @@ export default function ProjectsPage() {
                 <Badge variant="outline">{selectedProject.phase}</Badge>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm font-medium text-slate-500">Location</p>
@@ -286,8 +345,12 @@ export default function ProjectsPage() {
                     <p className="text-base text-slate-800">{selectedProject.agency}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-500">Start Date</p>
-                    <p className="text-base text-slate-800">{selectedProject.startDate}</p>
+                    <p className="text-sm font-medium text-slate-500">Project Timeline</p>
+                    <p className="text-base text-slate-800">{selectedProject.startDate} to {selectedProject.endDate}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-500">Project Phase</p>
+                    <p className="text-base text-slate-800">{selectedProject.phase}</p>
                   </div>
                 </div>
 
@@ -301,16 +364,31 @@ export default function ProjectsPage() {
                     <p className="text-base font-semibold text-green-600">₹{(selectedProject.utilized / 100000).toFixed(2)}L</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-500">End Date</p>
-                    <p className="text-base text-slate-800">{selectedProject.endDate}</p>
+                    <p className="text-sm font-medium text-slate-500">Funds Received</p>
+                    <p className="text-base font-semibold text-blue-600">₹{(selectedProject.fundReceived / 100000).toFixed(2)}L</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-500">Funds Pending</p>
+                    <p className="text-base font-semibold text-orange-600">₹{(selectedProject.fundPending / 100000).toFixed(2)}L</p>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm font-medium text-slate-500 mb-2">Project Progress</p>
-                <Progress value={selectedProject.progress} className="h-3" />
-                <p className="text-sm text-slate-600 mt-2">{selectedProject.progress}% Complete</p>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-2">Project Progress</p>
+                  <Progress value={selectedProject.progress} className="h-3" />
+                  <p className="text-sm text-slate-600 mt-2">{selectedProject.progress}% Complete</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-500 mb-2">Milestones</p>
+                  <div className="flex items-center gap-2">
+                    <Progress value={(selectedProject.milestonesCompleted / selectedProject.milestones) * 100} className="h-3 flex-1" />
+                    <span className="text-sm font-semibold text-slate-700">
+                      {selectedProject.milestonesCompleted}/{selectedProject.milestones}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="bg-slate-50 rounded-lg p-4">

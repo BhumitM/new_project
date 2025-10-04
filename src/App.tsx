@@ -7,6 +7,7 @@ import DashboardHome from './pages/DashboardHome';
 import AgenciesPage from './pages/AgenciesPage';
 import ProjectsPage from './pages/ProjectsPage';
 import FundFlowPage from './pages/FundFlowPage';
+import AgencyHistoryPage from './pages/AgencyHistoryPage';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="agencies" element={<AgenciesPage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="funds" element={<FundFlowPage />} />
+          <Route path="agency-history" element={<AgencyHistoryPage />} />
         </Route>
       </Routes>
     </Router>

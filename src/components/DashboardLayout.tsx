@@ -12,6 +12,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   LayoutDashboard,
   Building2,
   FolderKanban,
@@ -24,19 +31,42 @@ import {
   Settings,
   LogOut,
   User,
+  History,
 } from 'lucide-react';
+import { useUser, UserRole } from '@/contexts/UserContext';
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { user, setUser } = useUser();
 
-  const navigation = [
+  const handleRoleChange = (role: UserRole) => {
+    setUser({ ...user, role });
+  };
+
+  const getRoleName = (role: UserRole) => {
+    const roleNames = {
+      central_ministry: 'Central Ministry',
+      state_govt: 'State Government',
+      district_officer: 'District Officer',
+      agency: 'Agency',
+      public: 'Public',
+    };
+    return roleNames[role];
+  };
+
+  const baseNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Agencies', href: '/dashboard/agencies', icon: Building2 },
     { name: 'Projects', href: '/dashboard/projects', icon: FolderKanban },
     { name: 'Fund Flow', href: '/dashboard/funds', icon: TrendingUp },
-    { name: 'Public View', href: '/public', icon: Eye },
   ];
+
+  const navigation = user.role === 'district_officer'
+    ? [...baseNavigation, { name: 'Agency History', href: '/dashboard/agency-history', icon: History }]
+    : baseNavigation;
+
+  navigation.push({ name: 'Public View', href: '/public', icon: Eye });
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -69,6 +99,20 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <Select value={user.role} onValueChange={handleRoleChange}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="central_ministry">Central Ministry</SelectItem>
+                  <SelectItem value="state_govt">State Government</SelectItem>
+                  <SelectItem value="district_officer">District Officer</SelectItem>
+                  <SelectItem value="agency">Agency</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -79,15 +123,38 @@ export default function DashboardLayout() {
                 <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="w-8 h-8">
                     <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-700 text-white text-sm">
-                      MU
+                      {user.name.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden sm:inline text-sm font-medium">Ministry User</span>
+                  <div className="hidden sm:block text-left">
+                    <span className="text-sm font-medium block">{user.name}</span>
+                    <span className="text-xs text-slate-500">{getRoleName(user.role)}</span>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  <div>
+                    <p className="font-semibold">{user.name}</p>
+                    <p className="text-xs text-slate-500 font-normal">{getRoleName(user.role)}</p>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <div className="px-2 py-2 md:hidden">
+                  <p className="text-xs text-slate-500 mb-2">Switch Role</p>
+                  <Select value={user.role} onValueChange={handleRoleChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="central_ministry">Central Ministry</SelectItem>
+                      <SelectItem value="state_govt">State Government</SelectItem>
+                      <SelectItem value="district_officer">District Officer</SelectItem>
+                      <SelectItem value="agency">Agency</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <DropdownMenuSeparator className="md:hidden" />
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   Profile
